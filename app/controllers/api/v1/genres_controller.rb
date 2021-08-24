@@ -6,16 +6,16 @@ class Api::V1::GenresController < ApplicationController
     end
 
     def random_song
-        @genre = GenreArtist.find_by(name: params[:genre_name])
-        # render json: @genre
-        @artists = Artist.where(id: @genre)
-        # render json: @artists
-        @albums = Album.where(artist_id: @artists)
-        # render json: @albums
-        @has_songs = HasSong.where(album_id: @albums)
-        #render json: @has_songs
-        @songs = Song.where(id: @has_songs)
-        # render json: @songs.sample
-        render json: @songs.sample, root: 'data', each_serializer: SongSerializer, adapter: :json
+        @genres = GenreArtist.where(name: params[:genre_name].downcase)
+        @artist = @genres.sample
+        if @artist.nil?
+            render json: { error: "No se encontraron datos para el album: #{params[:genre_name]}" }, status: 400
+        else
+            @art = Artist.where(id: @artist.artist_id)
+            @albums = Album.where(artist_id: @art)
+            @has_songs = HasSong.where(album_id: @albums)
+            @songs = Song.where(id: @has_songs)
+            render json: @songs.sample, root: 'data', each_serializer: SongSerializer, adapter: :json
+        end
     end 
 end

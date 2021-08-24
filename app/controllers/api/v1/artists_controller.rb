@@ -18,13 +18,13 @@ class Api::V1::ArtistsController < ApplicationController
     end
 
     def show_albums_by_artist
-        @albums = Artist.find_by(name: params[:id]).albums
-        if @albums.nil?
+        @artist = Artist.find_by(id: params[:id])
+        if @artist.nil?
             render json: { error: "No se encontraron albums para el artista: #{params[:id]}" }, status: 400
         else
+            @albums = @artist.albums
             render json: @albums, root: 'data', each_serializer: AlbumSerializer, adapter: :json
         end
     end
-    
     
 end
